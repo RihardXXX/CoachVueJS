@@ -1,15 +1,20 @@
 <template>
   <li>
-    <h3>{{ fullName }}</h3>
+    <h3>{{ fullname }}</h3>
     <h4>${{ rate }}/hour</h4>
     <div>
-      <span v-for="area in areas" :key="area">{{ area }}</span>
+      <BaseBadge v-for="area in areas" :key="area" :type="area" :title="area">{{
+        area
+      }}</BaseBadge>
     </div>
     <div class="actions">
-      <router-link :to="{ name: 'coachesID', params: { id: id } }"
-        >Details</router-link
+      <BaseButton
+        mode="outline"
+        link="true"
+        :to="{ name: 'coachesID', params: { id: id } }"
+        >Details</BaseButton
       >
-      <router-link :to="coachDetailLink">Contact</router-link>
+      <BaseButton link="true" :to="coachDetailLink">Contact</BaseButton>
     </div>
   </li>
 </template>
@@ -20,7 +25,7 @@ export default {
   props: ['id', 'firstName', 'lastName', 'areas', 'rate'],
   computed: {
     fullname() {
-      return `${this.firstName} ${this.lastName}`;
+      return this.firstName + ' ' + this.lastName;
     },
     coachDetailLink() {
       return this.$route.path + `/${this.id}/contact`; // coaches/t1/contact

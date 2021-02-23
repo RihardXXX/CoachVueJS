@@ -7,7 +7,9 @@ const store = createStore({
     requestsModule,
     coachesModule
   },
-  state() {},
+  state() {
+    // userId: 'c3';
+  },
   mutations: {},
   actions: {},
   getters: {}

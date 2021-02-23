@@ -1,16 +1,18 @@
 <template>
   <section>
-    FILTER
+    <CoachFilter @change-filter="setFilter" />
   </section>
   <section>
     <BaseCard>
       <div class="controls">
-        <button>refresh</button>
-        <router-link :to="{ name: 'register' }">register as coach</router-link>
+        <BaseButton mode="outline">refresh</BaseButton>
+        <BaseButton link="true" :to="{ name: 'register' }"
+          >register as coach</BaseButton
+        >
       </div>
       <ul v-if="hasCoaches">
         <MvCoachItem
-          v-for="coach in coaches"
+          v-for="coach in filteredCoaches"
           :key="coach.is"
           :id="coach.id"
           :firstName="coach.firstName"
@@ -27,11 +29,22 @@
 <script>
 import { mapState } from 'vuex';
 import MvCoachItem from '@/components/coaches/CoachItem.vue';
+import CoachFilter from '@/components/coaches/CoachFilter';
 
 export default {
   name: 'MvCoachList',
   components: {
-    MvCoachItem
+    MvCoachItem,
+    CoachFilter
+  },
+  data() {
+    return {
+      activeFilter: {
+        frontend: true,
+        backend: true,
+        career: true
+      }
+    };
   },
   computed: {
     ...mapState({
@@ -42,6 +55,27 @@ export default {
     },
     hasCoaches() {
       return this.$store.getters.hasCoaches;
+    },
+    filteredCoaches() {
+      const coaches = this.coaches;
+
+      return coaches.filter(coach => {
+        if (this.activeFilter.frontend && coach.areas.includes('frontend')) {
+          return true;
+        }
+        if (this.activeFilter.backend && coach.areas.includes('backend')) {
+          return true;
+        }
+        if (this.activeFilter.career && coach.areas.includes('career')) {
+          return true;
+        }
+        return false;
+      });
+    }
+  },
+  methods: {
+    setFilter(updatedFilters) {
+      this.activeFilter = updatedFilters;
     }
   }
 };

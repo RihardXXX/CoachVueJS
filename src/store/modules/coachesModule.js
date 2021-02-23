@@ -21,13 +21,42 @@ const state = {
   ]
 };
 
-export const mutationsTypes = {};
+export const mutationsTypes = {
+  registerCoachStart: '[coachModule] registerCoachStart',
+  registerCoachSuccess: '[coachModule] registerCoacnSuccess',
+  registerCoachFailure: '[coachModule] registerCoachFailure'
+};
 
-export const actionsTypes = {};
+export const actionsTypes = {
+  registerCoach: '[coachModule] registerCoach'
+};
 
-const mutations = {};
+const mutations = {
+  [mutationsTypes.registerCoachStart]() {},
+  [mutationsTypes.registerCoachSuccess](state, payload) {
+    state.coaches.push(payload);
+  },
+  [mutationsTypes.registerCoachFailure]() {}
+};
 
-const actions = {};
+const actions = {
+  [actionsTypes.registerCoach](context, data) {
+    context.commit(mutationsTypes.registerCoachStart);
+    // const id = context.state.userId;
+    const coachData = {
+      id: 'c3',
+      firstName: data.first,
+      lastName: data.last,
+      description: data.desc,
+      hourlyRate: data.rate,
+      areas: data.areas
+    };
+
+    context.commit(mutationsTypes.registerCoachSuccess, coachData);
+
+    context.commit(mutationsTypes.registerCoachFailure);
+  }
+};
 
 const getters = {
   coachesName(state) {
