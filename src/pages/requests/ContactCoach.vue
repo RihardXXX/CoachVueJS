@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { actionsTypes } from '@/store/modules/requestsModule';
+
 export default {
   name: 'ContactCoach',
   data() {
@@ -60,16 +62,19 @@ export default {
       this[input].isValid = true;
     },
     submitForm() {
+      this.formIsValid = true; // factor main
       this.validateForm();
+
       if (!this.formIsValid) {
         return;
       }
 
-      const newRequest = {
+      this.$store.dispatch(actionsTypes.addRequest, {
+        coachId: this.$route.params.id,
         email: this.email.val,
         message: this.message.val
-      };
-      console.log(newRequest);
+      });
+
       this.formIsValid = true;
       this.email.val = '';
       this.message.val = '';
