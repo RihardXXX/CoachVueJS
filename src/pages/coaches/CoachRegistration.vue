@@ -18,7 +18,6 @@ export default {
   },
   methods: {
     saveData(data) {
-      console.log('test');
       this.$store.dispatch(actionsTypes.registerCoach, data);
       this.$router.push({ name: 'coaches' });
     }

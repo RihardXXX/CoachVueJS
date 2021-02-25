@@ -6,7 +6,7 @@
       </header>
       <ul v-if="hasRequest">
         <RequestsItem
-          v-for="request in requests"
+          v-for="request in filteredRequests"
           :key="request.id"
           :email="request.email"
           :message="request.message"
@@ -14,6 +14,7 @@
       </ul>
       <h3 v-else>You haven`t received any requests yet</h3>
     </base-card>
+    <!-- {{ filteredRequests }} -->
   </section>
 </template>
 
@@ -28,10 +29,15 @@ export default {
   },
   computed: {
     ...mapState({
-      requests: state => state.requestsModule.requests
+      requestsAll: state => state.requestsModule.requests,
+      userId: state => state.userId
     }),
+    // Filter requests for id where every coach
+    filteredRequests() {
+      return this.requestsAll.filter(req => req.coachId === this.userId);
+    },
     hasRequest() {
-      return this.requests && this.requests.length > 0;
+      return this.filteredRequests && this.filteredRequests.length > 0;
     }
   }
 };

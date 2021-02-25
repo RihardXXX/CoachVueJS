@@ -152,16 +152,15 @@ export default {
         return;
       }
 
-      const formData = {
-        first: this.firstname.val,
-        last: this.lastname.val,
-        desc: this.description.val,
-        rate: this.rate.val,
+      const coachData = {
+        firstName: this.firstname.val,
+        lastName: this.lastname.val,
+        description: this.description.val,
+        hourlyRate: this.rate.val,
         areas: this.areas.val
       };
-      console.log(formData);
 
-      this.$emit('save-data', formData);
+      this.$emit('save-data', coachData);
     }
   }
 };

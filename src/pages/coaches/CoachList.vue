@@ -5,12 +5,15 @@
   <section>
     <BaseCard>
       <div class="controls">
-        <BaseButton mode="outline">refresh</BaseButton>
-        <BaseButton link="true" :to="{ name: 'register' }"
+        <BaseButton mode="outline" @click="getAllCoaches">refresh</BaseButton>
+        <BaseButton link="true" :to="{ name: 'register' }" v-if="!isLoading"
           >register as coach</BaseButton
         >
       </div>
-      <ul v-if="hasCoaches">
+      <div v-if="isLoading">
+        <BaseSpinner></BaseSpinner>
+      </div>
+      <ul v-else-if="hasCoaches">
         <MvCoachItem
           v-for="coach in filteredCoaches"
           :key="coach.is"
@@ -30,6 +33,7 @@
 import { mapState } from 'vuex';
 import MvCoachItem from '@/components/coaches/CoachItem.vue';
 import CoachFilter from '@/components/coaches/CoachFilter';
+import { actionsTypes } from '@/store/modules/coachesModule';
 
 export default {
   name: 'MvCoachList',
@@ -46,9 +50,14 @@ export default {
       }
     };
   },
+  created() {
+    this.getAllCoaches();
+  },
   computed: {
     ...mapState({
-      coaches: state => state.coachesModule.coaches
+      coaches: state => state.coachesModule.coaches,
+      isLoading: state => state.coachesModule.isLoading,
+      errors: state => state.coachesModule.errors
     }),
     nameCoaches() {
       return this.$store.getters.coachesName;
@@ -76,6 +85,9 @@ export default {
   methods: {
     setFilter(updatedFilters) {
       this.activeFilter = updatedFilters;
+    },
+    getAllCoaches() {
+      this.$store.dispatch(actionsTypes.getAllCoaches);
     }
   }
 };

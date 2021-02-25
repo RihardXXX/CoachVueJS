@@ -1,60 +1,103 @@
+import apiAuth from '@/services/authCoaches';
+
 const state = {
-  coaches: [
-    {
-      id: 'c1',
-      firstName: 'Maximilian',
-      lastName: 'Schwarzmüller',
-      areas: ['frontend', 'backend', 'career'],
-      description:
-        "I'm Maximilian and I've worked as a freelance web developer for years. Let me help you become a developer as well!",
-      hourlyRate: 30
-    },
-    {
-      id: 'c2',
-      firstName: 'Julie',
-      lastName: 'Jones',
-      areas: ['frontend', 'career'],
-      description:
-        'I am Julie and as a senior developer in a big tech company, I can help you get your first job or progress in your current role.',
-      hourlyRate: 30
-    }
-  ]
+  errors: null,
+  isLoading: false,
+  coaches: null,
+  isLoggedIn: false
 };
 
 export const mutationsTypes = {
   registerCoachStart: '[coachModule] registerCoachStart',
   registerCoachSuccess: '[coachModule] registerCoacnSuccess',
-  registerCoachFailure: '[coachModule] registerCoachFailure'
+  registerCoachFailure: '[coachModule] registerCoachFailure',
+
+  getAllCoachesStart: '[coachModule] getAllCoachesStart',
+  getAllCoachesSuccess: '[coachModule] getAllCoachesSuccess',
+  getAllCoachesFailure: '[coachModule] getAllCoachesFailure'
 };
 
 export const actionsTypes = {
-  registerCoach: '[coachModule] registerCoach'
+  registerCoach: '[coachModule] registerCoach',
+  getAllCoaches: '[coachModule] getAllCoaches'
 };
 
 const mutations = {
-  [mutationsTypes.registerCoachStart]() {},
-  [mutationsTypes.registerCoachSuccess](state, payload) {
-    state.coaches.push(payload);
+  [mutationsTypes.registerCoachStart](state) {
+    state.errors = null;
+    state.isLoading = true;
   },
-  [mutationsTypes.registerCoachFailure]() {}
+  [mutationsTypes.registerCoachSuccess](state) {
+    state.errors = null;
+    state.isLoading = false;
+  },
+  [mutationsTypes.registerCoachFailure](state, payload) {
+    state.isLoading = false;
+    state.errors = payload;
+  },
+
+  [mutationsTypes.getAllCoachesStart](state) {
+    state.isLoading = true;
+  },
+  [mutationsTypes.getAllCoachesSuccess](state, payload) {
+    state.isLoading = false;
+    state.coaches = payload;
+  },
+  [mutationsTypes.getAllCoachesFailure](state, payload) {
+    state.isLoading = false;
+    state.errors = payload;
+  }
 };
 
 const actions = {
-  [actionsTypes.registerCoach](context, data) {
-    context.commit(mutationsTypes.registerCoachStart);
-    // const id = context.state.userId;
-    const coachData = {
-      id: 'c3',
-      firstName: data.first,
-      lastName: data.last,
-      description: data.desc,
-      hourlyRate: data.rate,
-      areas: data.areas
-    };
+  [actionsTypes.registerCoach](context, coachData) {
+    return new Promise(() => {
+      context.commit(mutationsTypes.registerCoachStart);
 
-    context.commit(mutationsTypes.registerCoachSuccess, coachData);
+      const newId = context.getters.getUserId;
 
-    context.commit(mutationsTypes.registerCoachFailure);
+      apiAuth
+        .register(newId, coachData)
+        .then(() => {
+          context.commit(mutationsTypes.registerCoachSuccess);
+        })
+        .catch(result => {
+          context.commit(
+            mutationsTypes.registerCoachFailure,
+            result.response.data.errors
+          );
+        });
+    });
+  },
+  [actionsTypes.getAllCoaches](context) {
+    return new Promise(() => {
+      context.commit(mutationsTypes.getAllCoachesStart);
+
+      apiAuth
+        .getAllCoaches()
+        .then(response => {
+          // console.log(response.data);
+
+          const coaches = [];
+
+          for (const key in response.data) {
+            let value = response.data[key];
+
+            const coach = {
+              id: key,
+              firstName: value.firstName,
+              lastName: value.lastName,
+              areas: value.areas,
+              hourlyRate: value.hourlyRate,
+              description: value.description
+            };
+            // console.log(coach);
+            coaches.push(coach);
+          }
+          context.commit(mutationsTypes.getAllCoachesSuccess, coaches);
+        })
+        .catch(err => context.commit(mutationsTypes.getAllCoachesFailure, err));
+    });
   }
 };
 
