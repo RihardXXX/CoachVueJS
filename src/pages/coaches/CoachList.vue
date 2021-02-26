@@ -13,6 +13,14 @@
       <div v-if="isLoading">
         <BaseSpinner></BaseSpinner>
       </div>
+      <base-dialog
+        v-else-if="errors"
+        :show="dialogWindow"
+        title="ERROR"
+        @close="handlerCloseError"
+      >
+        {{ errors.message + ', please try again' }}
+      </base-dialog>
       <ul v-else-if="hasCoaches">
         <MvCoachItem
           v-for="coach in filteredCoaches"
@@ -26,6 +34,7 @@
       </ul>
       <h3 v-else>No coaches</h3>
     </BaseCard>
+    {{ errors }}
   </section>
 </template>
 
@@ -47,7 +56,8 @@ export default {
         frontend: true,
         backend: true,
         career: true
-      }
+      },
+      dialogWindow: true
     };
   },
   created() {
@@ -87,7 +97,11 @@ export default {
       this.activeFilter = updatedFilters;
     },
     getAllCoaches() {
+      this.dialogWindow = true;
       this.$store.dispatch(actionsTypes.getAllCoaches);
+    },
+    handlerCloseError() {
+      this.dialogWindow = false;
     }
   }
 };

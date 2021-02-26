@@ -71,13 +71,17 @@ export default {
 
       this.$store.dispatch(actionsTypes.addRequest, {
         coachId: this.$route.params.id,
-        email: this.email.val,
-        message: this.message.val
+        requestCoach: {
+          email: this.email.val,
+          message: this.message.val
+        }
       });
 
       this.formIsValid = true;
       this.email.val = '';
       this.message.val = '';
+
+      this.$router.push({ name: 'requests' });
     }
   }
 };
