@@ -1,6 +1,7 @@
 import apiAuth from '@/services/authCoaches';
 
 const state = {
+  lastFetch: null,
   errors: null,
   isLoading: false,
   coaches: null,
@@ -46,6 +47,10 @@ const mutations = {
   [mutationsTypes.getAllCoachesFailure](state, payload) {
     state.isLoading = false;
     state.errors = payload;
+  },
+
+  setTimeStampFetch(state) {
+    state.lastFetch = new Date().getTime();
   }
 };
 
@@ -69,8 +74,13 @@ const actions = {
         });
     });
   },
-  [actionsTypes.getAllCoaches](context) {
+  [actionsTypes.getAllCoaches](context, payload) {
     return new Promise(() => {
+      // start cash
+      if (!context.getters.shouldUpdate && !payload.refresh) {
+        return;
+      }
+
       context.commit(mutationsTypes.getAllCoachesStart);
 
       apiAuth
@@ -95,6 +105,7 @@ const actions = {
             coaches.push(coach);
           }
           context.commit(mutationsTypes.getAllCoachesSuccess, coaches);
+          context.commit('setTimeStampFetch');
         })
         .catch(err => context.commit(mutationsTypes.getAllCoachesFailure, err));
     });
@@ -109,6 +120,14 @@ const getters = {
   },
   hasCoaches(state) {
     return state.coaches && state.coaches.length > 0;
+  },
+  shouldUpdate(state) {
+    const lastFetch = state.lastFetch;
+    if (!lastFetch) {
+      return true;
+    }
+    const currentTimeStamp = new Date().getTime();
+    return (currentTimeStamp - lastFetch) / 1000 > 60;
   }
 };
 

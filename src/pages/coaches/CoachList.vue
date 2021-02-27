@@ -1,41 +1,44 @@
 <template>
-  <section>
-    <CoachFilter @change-filter="setFilter" />
-  </section>
-  <section>
-    <BaseCard>
-      <div class="controls">
-        <BaseButton mode="outline" @click="getAllCoaches">refresh</BaseButton>
-        <BaseButton link="true" :to="{ name: 'register' }" v-if="!isLoading"
-          >register as coach</BaseButton
+  <div>
+    <section>
+      <CoachFilter @change-filter="setFilter" />
+    </section>
+    <section>
+      <BaseCard>
+        <div class="controls">
+          <BaseButton mode="outline" @click="getAllCoaches(true)"
+            >refresh</BaseButton
+          >
+          <BaseButton link="true" :to="{ name: 'register' }" v-if="!isLoading"
+            >register as coach</BaseButton
+          >
+        </div>
+        <div v-if="isLoading">
+          <BaseSpinner></BaseSpinner>
+        </div>
+        <base-dialog
+          v-else-if="errors"
+          :show="dialogWindow"
+          title="ERROR"
+          @close="handlerCloseError"
         >
-      </div>
-      <div v-if="isLoading">
-        <BaseSpinner></BaseSpinner>
-      </div>
-      <base-dialog
-        v-else-if="errors"
-        :show="dialogWindow"
-        title="ERROR"
-        @close="handlerCloseError"
-      >
-        {{ errors.message + ', please try again' }}
-      </base-dialog>
-      <ul v-else-if="hasCoaches">
-        <MvCoachItem
-          v-for="coach in filteredCoaches"
-          :key="coach.is"
-          :id="coach.id"
-          :firstName="coach.firstName"
-          :lastName="coach.lastName"
-          :rate="coach.hourlyRate"
-          :areas="coach.areas"
-        />
-      </ul>
-      <h3 v-else>No coaches</h3>
-    </BaseCard>
-    {{ errors }}
-  </section>
+          {{ errors.message + ', please try again' }}
+        </base-dialog>
+        <ul v-else-if="hasCoaches">
+          <MvCoachItem
+            v-for="coach in filteredCoaches"
+            :key="coach.is"
+            :id="coach.id"
+            :firstName="coach.firstName"
+            :lastName="coach.lastName"
+            :rate="coach.hourlyRate"
+            :areas="coach.areas"
+          />
+        </ul>
+        <h3 v-else>No coaches</h3>
+      </BaseCard>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -96,9 +99,9 @@ export default {
     setFilter(updatedFilters) {
       this.activeFilter = updatedFilters;
     },
-    getAllCoaches() {
+    getAllCoaches(refresh = false) {
       this.dialogWindow = true;
-      this.$store.dispatch(actionsTypes.getAllCoaches);
+      this.$store.dispatch(actionsTypes.getAllCoaches, { refresh: refresh });
     },
     handlerCloseError() {
       this.dialogWindow = false;
