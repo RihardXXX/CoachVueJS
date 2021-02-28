@@ -83,7 +83,7 @@ export default {
       this.email.val = '';
       this.message.val = '';
 
-      this.$router.push({ name: 'requests' });
+      // this.$router.push({ name: 'requests' });
     }
   }
 };

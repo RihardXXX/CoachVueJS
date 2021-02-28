@@ -11,6 +11,8 @@ import BaseDialog from '@/components/ui/BaseDialog';
 
 const app = createApp(App);
 
+app.config.devtools = true;
+
 app.component('BaseCard', BaseCard);
 app.component('BaseButton', BaseButton);
 app.component('BaseBadge', BaseBadge);

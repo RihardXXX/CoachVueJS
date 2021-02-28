@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-axios.defaults.baseURL =
-  'https://vue-project-a3e9a-default-rtdb.firebaseio.com';
+const axiosBase = axios.create({
+  baseURL: 'https://vue-project-a3e9a-default-rtdb.firebaseio.com',
+  timeout: 1000
+});
 
-export default axios;
+const axiosAuth = axios.create({
+  baseURL: 'https://identitytoolkit.googleapis.com/v1',
+  timeout: 1000
+});
+
+export default {
+  axiosBase,
+  axiosAuth
+};

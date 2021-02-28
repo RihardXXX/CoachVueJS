@@ -1,9 +1,11 @@
 import axios from '@/services/axios';
 
-const addRequest = (coachId, requestCoach) =>
-  axios.post(`/requests/${coachId}.json`, requestCoach);
+const { axiosBase } = axios;
 
-const getRequests = coachId => axios.get(`/requests/${coachId}.json`);
+const addRequest = (coachId, requestCoach) =>
+  axiosBase.post(`/requests/${coachId}.json`, requestCoach);
+
+const getRequests = coachId => axiosBase.get(`/requests/${coachId}.json`);
 
 export default {
   addRequest,

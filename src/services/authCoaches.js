@@ -1,11 +1,16 @@
 import axios from '@/services/axios';
 
-const register = (newId, coachData) =>
-  axios.put(`/coaches/${newId}.json`, coachData);
+const { axiosAuth } = axios;
 
-const getAllCoaches = () => axios.get('/coaches.json');
+const apiKey = 'AIzaSyBDdZ6jcgv413MMw0Li3zp4iGFwRnyg6Ow';
+
+const signUp = credentials =>
+  axiosAuth.post(`/accounts:signUp?key=${apiKey}`, {
+    email: credentials.email,
+    password: credentials.password,
+    returnSecureToken: true
+  });
 
 export default {
-  register,
-  getAllCoaches
+  signUp
 };

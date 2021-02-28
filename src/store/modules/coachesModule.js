@@ -1,42 +1,23 @@
-import apiAuth from '@/services/authCoaches';
+import apiCoaches from '@/services/coaches';
 
 const state = {
   lastFetch: null,
   errors: null,
   isLoading: false,
-  coaches: null,
-  isLoggedIn: false
+  coaches: null
 };
 
 export const mutationsTypes = {
-  registerCoachStart: '[coachModule] registerCoachStart',
-  registerCoachSuccess: '[coachModule] registerCoacnSuccess',
-  registerCoachFailure: '[coachModule] registerCoachFailure',
-
   getAllCoachesStart: '[coachModule] getAllCoachesStart',
   getAllCoachesSuccess: '[coachModule] getAllCoachesSuccess',
   getAllCoachesFailure: '[coachModule] getAllCoachesFailure'
 };
 
 export const actionsTypes = {
-  registerCoach: '[coachModule] registerCoach',
   getAllCoaches: '[coachModule] getAllCoaches'
 };
 
 const mutations = {
-  [mutationsTypes.registerCoachStart](state) {
-    state.errors = null;
-    state.isLoading = true;
-  },
-  [mutationsTypes.registerCoachSuccess](state) {
-    state.errors = null;
-    state.isLoading = false;
-  },
-  [mutationsTypes.registerCoachFailure](state, payload) {
-    state.isLoading = false;
-    state.errors = payload;
-  },
-
   [mutationsTypes.getAllCoachesStart](state) {
     state.isLoading = true;
   },
@@ -55,25 +36,6 @@ const mutations = {
 };
 
 const actions = {
-  [actionsTypes.registerCoach](context, coachData) {
-    return new Promise(() => {
-      context.commit(mutationsTypes.registerCoachStart);
-
-      const newId = context.getters.getUserId;
-
-      apiAuth
-        .register(newId, coachData)
-        .then(() => {
-          context.commit(mutationsTypes.registerCoachSuccess);
-        })
-        .catch(result => {
-          context.commit(
-            mutationsTypes.registerCoachFailure,
-            result.response.data.errors
-          );
-        });
-    });
-  },
   [actionsTypes.getAllCoaches](context, payload) {
     return new Promise(() => {
       // start cash
@@ -83,7 +45,7 @@ const actions = {
 
       context.commit(mutationsTypes.getAllCoachesStart);
 
-      apiAuth
+      apiCoaches
         .getAllCoaches()
         .then(response => {
           // console.log(response.data);
