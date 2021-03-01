@@ -1,4 +1,5 @@
 import apiAuth from '@/services/authCoaches';
+import localStorageFunc from '@/helpers/persistanceStorage';
 
 const state = {
   isLoggedIn: false,
@@ -30,8 +31,10 @@ const mutations = {
   },
   [mutationsTypes.signInSuccess](state, payload) {
     state.isLoading = false;
-    state.isLoading = true;
-    state.auth = payload;
+    state.token = payload.idToken;
+    state.userId = payload.localId;
+    state.tokenExpiration = payload.expiresIn;
+    state.isLoggedIn = true;
   },
   [mutationsTypes.signInFailure](state, payload) {
     state.isLoading = false;
@@ -46,7 +49,6 @@ const mutations = {
     state.token = payload.idToken;
     state.userId = payload.localId;
     state.tokenExpiration = payload.expiresIn;
-    // state.isLoggedIn = true;
   },
   [mutationsTypes.signUpFailure](state, payload) {
     state.isLoading = false;
@@ -55,17 +57,37 @@ const mutations = {
 };
 
 const actions = {
-  // [actionsTypes.signIn](context, credentials) {
-  //   return new Promise(() => {});
-  // },
+  [actionsTypes.signIn](context, credentials) {
+    return new Promise(resolve => {
+      context.commit(mutationsTypes.signInStart);
+
+      apiAuth
+        .signIn(credentials)
+        .then(response => {
+          console.log(response.data);
+
+          context.commit(mutationsTypes.signInSuccess, response.data);
+
+          localStorageFunc.setItem('accessToken', response.data.idToken);
+
+          const message = 'you success sign in';
+          resolve(message);
+        })
+        .catch(err => {
+          context.commit(mutationsTypes.signInFailure, err);
+        });
+    });
+  },
   [actionsTypes.signUp](context, credentials) {
-    return new Promise(() => {
+    return new Promise(resolve => {
       context.commit(mutationsTypes.signUpStart);
       apiAuth
         .signUp(credentials)
         .then(response => {
           // console.log(response.data);
           context.commit(mutationsTypes.signUpSuccess, response.data);
+          const message = 'you success sign up';
+          resolve(message);
         })
         .catch(err => {
           context.commit(mutationsTypes.signUpFailure, err);
@@ -77,6 +99,9 @@ const actions = {
 const getters = {
   getUserId(state) {
     return state.userId;
+  },
+  token(state) {
+    return state.token;
   }
 };
 

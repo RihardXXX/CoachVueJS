@@ -1,5 +1,14 @@
 <template>
   <div>
+    <base-dialog :show="isLoading" title="Authentication...." fixed>
+      <base-spinner></base-spinner>
+    </base-dialog>
+    <div v-if="errors">
+      <base-dialog show="true" title="error" @close="closeWindow">
+        <h3>Error please try again</h3>
+      </base-dialog>
+    </div>
+
     <base-card>
       <form @submit.prevent="submitForm">
         <div class="form-control">
@@ -33,7 +42,12 @@
           >toggle SigIn or SignUp</base-button
         >
       </form>
-      {{ userId }}
+      <div v-if="statusMessage" class="message">
+        <h2>{{ message }}</h2>
+        <base-button @click="closeStatusMessage" class="message"
+          >close message</base-button
+        >
+      </div>
     </base-card>
   </div>
 </template>
@@ -41,8 +55,11 @@
 <script>
 import { actionsTypes } from '@/store/modules/authModule';
 import { mapState } from 'vuex';
+import BaseDialog from '../../components/ui/BaseDialog.vue';
+import BaseSpinner from '../../components/ui/BaseSpinner.vue';
 
 export default {
+  components: { BaseDialog, BaseSpinner },
   name: 'UserAuth',
   data() {
     return {
@@ -56,15 +73,26 @@ export default {
       },
       formsIsValid: true,
       disabled: false,
-      mode: 'sign In'
+      mode: 'sign In',
+      statusMessage: false,
+      message: '',
+      errorWindows: this.errors
     };
   },
   computed: {
     ...mapState({
-      userId: state => state.authModule.userId
+      userId: state => state.authModule.userId,
+      errors: state => state.authModule.errors,
+      isLoading: state => state.authModule.isLoading
     })
   },
   methods: {
+    closeWindow() {
+      this.$router.push({ name: 'coaches' });
+    },
+    closeStatusMessage() {
+      this.statusMessage = false;
+    },
     clearInput(input) {
       this[input].isValid = true;
     },
@@ -87,15 +115,29 @@ export default {
         return;
       }
 
+      const credentials = {
+        email: this.email.value,
+        password: this.password.value
+      };
+
       if (this.mode === 'sign In') {
         console.log('sign In');
+
+        this.$store.dispatch(actionsTypes.signIn, credentials).then(message => {
+          this.statusMessage = true;
+          this.message = message;
+        });
+
+        setTimeout(() => {
+          this.$router.push({ name: 'coaches' });
+        }, 5000);
       } else if (this.mode === 'sign Up') {
         console.log('sign Up');
 
         // console.log(actionsTypes);
-        this.$store.dispatch(actionsTypes.signUp, {
-          email: this.email.value,
-          password: this.password.value
+        this.$store.dispatch(actionsTypes.signUp, credentials).then(message => {
+          this.statusMessage = true;
+          this.message = message;
         });
       }
 
@@ -138,6 +180,12 @@ textarea {
   font: inherit;
   border: 1px solid #ccc;
   padding: 0.15rem;
+}
+
+.message {
+  text-align: center;
+  /* color: white; */
+  margin: 0 auto;
 }
 
 input:focus,

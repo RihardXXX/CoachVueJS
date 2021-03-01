@@ -8,11 +8,29 @@
         <li>
           <router-link :to="{ name: 'coaches' }">All Coaches</router-link>
         </li>
-        <li><router-link :to="{ name: 'requests' }">Requests</router-link></li>
+        <li v-if="isLoggedIn">
+          <router-link :to="{ name: 'requests' }">Requests</router-link>
+        </li>
+        <li v-else>
+          <router-link :to="{ name: 'auth' }">Sign In</router-link>
+        </li>
       </ul>
     </nav>
   </header>
 </template>
+
+<script>
+import { mapState } from 'vuex';
+
+export default {
+  name: 'TheHeader',
+  computed: {
+    ...mapState({
+      isLoggedIn: state => state.authModule.isLoggedIn
+    })
+  }
+};
+</script>
 
 <style scoped>
 header {

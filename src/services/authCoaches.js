@@ -11,6 +11,14 @@ const signUp = credentials =>
     returnSecureToken: true
   });
 
+const signIn = credentials =>
+  axiosAuth.post(`/accounts:signInWithPassword?key=${apiKey}`, {
+    email: credentials.email,
+    password: credentials.password,
+    returnSecureToken: true
+  });
+
 export default {
-  signUp
+  signUp,
+  signIn
 };

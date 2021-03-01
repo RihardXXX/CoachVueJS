@@ -9,7 +9,13 @@
           <BaseButton mode="outline" @click="getAllCoaches(true)"
             >refresh</BaseButton
           >
-          <BaseButton link="true" :to="{ name: 'register' }" v-if="!isLoading"
+          <BaseButton v-if="!isLoggedIn" link="true" to="auth"
+            >sign in</BaseButton
+          >
+          <BaseButton
+            link="true"
+            :to="{ name: 'register' }"
+            v-if="!isLoading && isLoggedIn"
             >register as coach</BaseButton
           >
         </div>
@@ -70,7 +76,8 @@ export default {
     ...mapState({
       coaches: state => state.coachesModule.coaches,
       isLoading: state => state.coachesModule.isLoading,
-      errors: state => state.coachesModule.errors
+      errors: state => state.coachesModule.errors,
+      isLoggedIn: state => state.authModule.isLoggedIn
     }),
     nameCoaches() {
       return this.$store.getters.coachesName;
