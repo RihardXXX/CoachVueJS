@@ -1,10 +1,7 @@
 import axios from '@/services/axios';
+import localStorageFunc from '@/helpers/persistanceStorage';
 
-import storeAuthModule from '@/store/modules/authModule';
-
-const token = storeAuthModule.state.token;
-
-// console.log(token);
+const token = localStorageFunc.getItem('token');
 
 const { axiosBase } = axios;
 

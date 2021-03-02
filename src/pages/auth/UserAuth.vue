@@ -121,7 +121,7 @@ export default {
       };
 
       if (this.mode === 'sign In') {
-        console.log('sign In');
+        // console.log('sign In');
 
         this.$store.dispatch(actionsTypes.signIn, credentials).then(message => {
           this.statusMessage = true;
@@ -129,12 +129,11 @@ export default {
         });
 
         setTimeout(() => {
-          this.$router.push({ name: 'coaches' });
-        }, 5000);
+          this.$router.push({ name: 'register' });
+        }, 3000);
       } else if (this.mode === 'sign Up') {
-        console.log('sign Up');
+        // console.log('sign Up');
 
-        // console.log(actionsTypes);
         this.$store.dispatch(actionsTypes.signUp, credentials).then(message => {
           this.statusMessage = true;
           this.message = message;

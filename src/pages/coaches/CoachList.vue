@@ -10,7 +10,7 @@
             >refresh</BaseButton
           >
           <BaseButton v-if="!isLoggedIn" link="true" to="auth"
-            >sign in</BaseButton
+            >Login</BaseButton
           >
           <BaseButton
             link="true"

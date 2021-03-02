@@ -17,12 +17,16 @@ export const mutationsTypes = {
 
   signUpStart: '[authNodule] signUpStart',
   signUpSuccess: '[authNodule] signUpSuccess',
-  signUpFailure: '[authNodule] signUpFailure'
+  signUpFailure: '[authNodule] signUpFailure',
+
+  logoutStart: '[authModule] logoutStart'
 };
 
 export const actionsTypes = {
   signIn: '[authModule] signIn',
-  signUp: '[authModule] signUp'
+  signUp: '[authModule] signUp',
+  logout: '[authModule] logout',
+  trySignIn: '[authModule] trySignIn'
 };
 
 const mutations = {
@@ -33,8 +37,10 @@ const mutations = {
     state.isLoading = false;
     state.token = payload.idToken;
     state.userId = payload.localId;
-    state.tokenExpiration = payload.expiresIn;
     state.isLoggedIn = true;
+  },
+  changeTimeTokenExpiration(state, payload) {
+    state.tokenExpiration = payload;
   },
   [mutationsTypes.signInFailure](state, payload) {
     state.isLoading = false;
@@ -50,9 +56,17 @@ const mutations = {
     state.userId = payload.localId;
     state.tokenExpiration = payload.expiresIn;
   },
+
   [mutationsTypes.signUpFailure](state, payload) {
     state.isLoading = false;
     state.errors = payload;
+  },
+
+  [mutationsTypes.logoutStart](state) {
+    state.token = null;
+    state.userId = null;
+    state.tokenExpiration = null;
+    state.isLoggedIn = false;
   }
 };
 
@@ -64,11 +78,18 @@ const actions = {
       apiAuth
         .signIn(credentials)
         .then(response => {
-          console.log(response.data);
+          // console.log(response.data);
 
           context.commit(mutationsTypes.signInSuccess, response.data);
 
-          localStorageFunc.setItem('accessToken', response.data.idToken);
+          const expiresIn = +response.data.expiresIn * 1000;
+          const expirationDate = new Date().getTime() + expiresIn;
+
+          localStorageFunc.setItem('token', response.data.idToken);
+          localStorageFunc.setItem('userId', response.data.idToken);
+          localStorageFunc.setItem('tokenExpiration', expirationDate);
+
+          context.commit('changeTimeTokenExpiration', expirationDate);
 
           const message = 'you success sign in';
           resolve(message);
@@ -78,6 +99,21 @@ const actions = {
         });
     });
   },
+  [actionsTypes.trySignIn](context) {
+    const token = localStorageFunc.getItem('token');
+    const userId = localStorageFunc.getItem('userId');
+    const tokenExpiration = localStorageFunc.getItem('tokenExpiration');
+
+    // const expiresIn = +tokenExpiration - new Date().getTime();
+
+    if (token && userId) {
+      context.commit(mutationsTypes.signInSuccess, {
+        token: token,
+        userId: userId,
+        tokenExpiration: tokenExpiration
+      });
+    }
+  },
   [actionsTypes.signUp](context, credentials) {
     return new Promise(resolve => {
       context.commit(mutationsTypes.signUpStart);
@@ -86,12 +122,21 @@ const actions = {
         .then(response => {
           // console.log(response.data);
           context.commit(mutationsTypes.signUpSuccess, response.data);
-          const message = 'you success sign up';
+          const message = 'you success sign up, please sign in';
           resolve(message);
         })
         .catch(err => {
           context.commit(mutationsTypes.signUpFailure, err);
         });
+    });
+  },
+  [actionsTypes.logout](context) {
+    return new Promise(resolve => {
+      localStorageFunc.setItem('token', '');
+      localStorageFunc.setItem('userId', '');
+      localStorageFunc.setItem('tokenExpiration', '');
+      context.commit(mutationsTypes.logoutStart);
+      resolve('your logout');
     });
   }
 };
@@ -102,6 +147,9 @@ const getters = {
   },
   token(state) {
     return state.token;
+  },
+  getIsloggedIn(state) {
+    return state.isLoggedIn;
   }
 };
 

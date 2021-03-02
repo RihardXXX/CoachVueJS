@@ -9,11 +9,15 @@
 
 <script>
 import TheHeader from '@/components/layout/TheHeader';
+import { actionsTypes } from '@/store/modules/authModule';
 
 export default {
   name: 'App',
   components: {
     TheHeader
+  },
+  created() {
+    this.$store.dispatch(actionsTypes.trySignIn);
   }
 };
 </script>

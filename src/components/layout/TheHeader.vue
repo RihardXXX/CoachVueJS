@@ -14,6 +14,9 @@
         <li v-else>
           <router-link :to="{ name: 'auth' }">Sign In</router-link>
         </li>
+        <li v-if="isLoggedIn">
+          <base-button @click="logout">Logout</base-button>
+        </li>
       </ul>
     </nav>
   </header>
@@ -21,13 +24,22 @@
 
 <script>
 import { mapState } from 'vuex';
+import BaseButton from '../ui/BaseButton.vue';
+import { actionsTypes } from '@/store/modules/authModule';
 
 export default {
+  components: { BaseButton },
   name: 'TheHeader',
   computed: {
     ...mapState({
       isLoggedIn: state => state.authModule.isLoggedIn
     })
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch(actionsTypes.logout);
+      this.$router.push({ name: 'coaches' });
+    }
   }
 };
 </script>
